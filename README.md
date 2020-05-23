@@ -65,48 +65,48 @@ timeRange	String	    是	    20190101010101,20190823221422	时间区间
 ## 2.1构造datamarttoDWS类
 初始化链接接口相关信息、链接数据库相关信息。
 ```python
-	def __init__(self,url="****",userName="****",password="****",dataCode="****",current=1,pageSize=1000000,timeRange="****",):
-		_param = self.param  
-		self._url = url
-		self._userName = userName
-		self._password = password
-		self._dataCode = dataCode
-		self._current = current
-		self._pageSize = pageSize
-		self._timeRange = timeRange
-		self._data = self.data 
-		self._dbhost = _param.host
-		self._dbport = _param.port
-		self._dbdatabase = _param.database
-		self._dbuser = _param.password
-		self._dbpassword = _param.client_encoding
-		self._client_encoding = _param.client_encoding
-		self._tablename = _param.tablename
-		self._json_path = _param.json_path
+def __init__(self,url="****",userName="****",password="****",dataCode="****",current=1,pageSize=1000000,timeRange="****",):
+	_param = self.param  
+	self._url = url
+	self._userName = userName
+	self._password = password
+	self._dataCode = dataCode
+	self._current = current
+	self._pageSize = pageSize
+	self._timeRange = timeRange
+	self._data = self.data 
+	self._dbhost = _param.host
+	self._dbport = _param.port
+	self._dbdatabase = _param.database
+	self._dbuser = _param.password
+	self._dbpassword = _param.client_encoding
+	self._client_encoding = _param.client_encoding
+	self._tablename = _param.tablename
+	self._json_path = _param.json_path
 ```
 ## 2.2实现数据获取接口函数
 利用requests库的get方法进行数据的获取。
 ```python
-	def crawler(self):
-		starttime = time.clock()
-		url = self._url.format(self._userName, self._password, self._dataCode, self._current, self._pageSize,self._timeRange)
-		try:
-			while 1:
-				timeout = 5
-				mp = requests.get(url=url, headers=self.headers, timeout=timeout)
-				if mp.status_code == 200: 
-					print("数据获取时间为{0}秒".format(round(time.clock() - starttime, 2)))
-					return mp.content
-				else:
-					if timeout > 100: 
-						return None
-					timeout += 2
-		except (requests.exceptions.ReadTimeout, requests.exceptions.RequestException) as e:
-			print(e)
-			return None
+def crawler(self):
+	starttime = time.clock()
+	url = self._url.format(self._userName, self._password, self._dataCode, self._current, self._pageSize,self._timeRange)
+	try:
+		while 1:
+			timeout = 5
+			mp = requests.get(url=url, headers=self.headers, timeout=timeout)
+			if mp.status_code == 200: 
+				print("数据获取时间为{0}秒".format(round(time.clock() - starttime, 2)))
+				return mp.content
+			else:
+				if timeout > 100: 
+					return None
+				timeout += 2
+	except (requests.exceptions.ReadTimeout, requests.exceptions.RequestException) as e:
+		print(e)
+		return None
 
-			
-	data = property(crawler)
+		
+data = property(crawler)
 ```
 ## 2.3实现数据的解析入DWS数据库
 利用json库处理多重嵌套的json格式bytes串解析，利用psycopg2库进行DWS数据的入库操作。代码的关键点主要有两点：
@@ -140,21 +140,21 @@ def readjsontoDWS(self):
 ## 2.4Linux终端以指令的方式调用
 加入argparse的add_argument方法使用，可以方便的使py文件被定期调度执行，方便扩展。
 ```python
-	def getparam(self):
-		parser = argparse.ArgumentParser()
-		parser.add_argument('-url', default=""****",")
-		parser.add_argument('-host', default='"****",')
-		parser.add_argument('-port', default='8000')
-		parser.add_argument('-database', default='"****",')
-		parser.add_argument('-password', default='"****",')
-		parser.add_argument('-client_encoding', default='UTF-8')
-		parser.add_argument('-json_path', default='data.rows')
-		parser.add_argument('-tablename', default='"****",')
-		args = parser.parse_args()
-		return args
+def getparam(self):
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-url', default=""****",")
+	parser.add_argument('-host', default='"****",')
+	parser.add_argument('-port', default='8000')
+	parser.add_argument('-database', default='"****",')
+	parser.add_argument('-password', default='"****",')
+	parser.add_argument('-client_encoding', default='UTF-8')
+	parser.add_argument('-json_path', default='data.rows')
+	parser.add_argument('-tablename', default='"****",')
+	args = parser.parse_args()
+	return args
 
 		
-	param = property(getparam)
+param = property(getparam)
 ```
 
 # 3.待改进的部分
@@ -162,4 +162,3 @@ def readjsontoDWS(self):
 1.需进一步改进数据解析函数，针对不同的json格式应该能根据参数内容提供不同的解析方法。
 
 2.需针对获取的数据类型（str、int、datatime、float）不同，进行建表语句（CREATE TABLE）的自动生成，消除人工工作量及错误。
-
